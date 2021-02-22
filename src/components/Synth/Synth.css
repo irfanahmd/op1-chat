@@ -1,0 +1,27 @@
+.note-white {
+  height: 164px;
+  width: 80px;
+  background: white;
+  border: 1px solid darkgray;
+  border-radius: 5px;
+  margin: 2px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.note-black {
+  height: 80px;
+  width: 122px;
+  background: #ccc;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  margin: 2px;
+  cursor: pointer;
+  color: white;
+}
+
+.note-black.e,
+.note-black.p {
+  height: 80px;
+  width: 80px;
+}

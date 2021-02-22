@@ -3,7 +3,7 @@
   width: 80px;
   background: white;
   border: 1px solid darkgray;
-  border-radius: 5px;
+  border-radius: 2px;
   margin: 2px;
   cursor: pointer;
   text-transform: uppercase;
@@ -14,7 +14,7 @@
   width: 122px;
   background: #ccc;
   border: 1px solid darkgray;
-  border-radius: 5px;
+  border-radius: 2px;
   margin: 2px;
   cursor: pointer;
   color: white;
@@ -45,5 +45,24 @@
 
 .col-2 {
   display: flex;
-  align-self: flex-end;
+  /* align-self: flex-end; */
+}
+
+.active {
+  background-color: lightcyan;
+  color: #darkgray;
+}
+
+.synth-keys {
+  height: 80px;
+  width: 80px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.display {
+  background-color: black;;
+  height: 164px;
+  width: 80px;
 }

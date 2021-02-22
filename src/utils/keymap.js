@@ -28,7 +28,7 @@ const allKeys = {
     { id: "q  w", pressed: false, shiftUp: false },
     { id: "e", pressed: false, shiftUp: false },
     { id: "r", pressed: false, shiftUp: false },
-    { id: "t y", pressed: false, shiftUp: true },
+    { id: "t  y", pressed: false, shiftUp: true },
     { id: "u", pressed: false, shiftUp: true },
     { id: "i  o", pressed: false, shiftUp: true },
     { id: "p", pressed: false, shiftUp: true },

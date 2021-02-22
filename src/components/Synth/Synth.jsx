@@ -1,70 +1,90 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './Synth.css'
+import { keyToNote, allKeys } from "../../utils/keymap";
 
+import * as Tone from "tone";
 
 const Synth = (props) => {
 
-  const keyState = {
-    blackobjects: [
-      { id: "q  w", pressed: false, shiftUp: false},
-      { id: "e", pressed: false, shiftUp: false},
-      { id: "r", pressed: false, shiftUp: false},
-      { id: "t y", pressed: false, shiftUp: true},
-      { id: "u", pressed: false, shiftUp: true},
-      { id: "i  o", pressed: false, shiftUp: true},
-      { id: "p", pressed: false, shiftUp: true},
-      { id: "[", pressed: false, shiftUp: true},
-    ],
-    whiteobjects: [
-      { id: "a", pressed: false, shiftUp: false },
-      { id: "s", pressed: false, shiftUp: false },
-      { id: "d", pressed: false, shiftUp: false },
-      { id: "f", pressed: false, shiftUp: false },
-      { id: "g", pressed: false, shiftUp: true },
-      { id: "h", pressed: false, shiftUp: true },
-      { id: "j", pressed: false, shiftUp: true },
-      { id: "k", pressed: false, shiftUp: true },
-      { id: "l", pressed: false, shiftUp: true },
-      { id: ";", pressed: false, shiftUp: true },
-      { id: "'", pressed: false, shiftUp: true },
-    ],
+  const[octave, setOctave] = useState(4)
+  const [keyState, setPressed] = useState(allKeys)
+
+  let synth = new Tone.PolySynth().toDestination();
+
+  useEffect(() => {
+    window.addEventListener("keydown", downHandler);
+    window.addEventListener("keyup", upHandler);
+    return () => {
+      window.removeEventListener("keydown", downHandler);
+      window.removeEventListener("keyup", upHandler);
+    };
+  }, [])
+
+  function upHandler(){
+
   }
+  
+  function downHandler(){
+    
+  }
+
+  function playNote(note) {
+    synth.triggerAttack(note)
+  }
+
+  function stopNote(note) {
+    synth.triggerRelease(note)
+  }
+
+  function getNote(key, shift) {
+    if(shift){
+      return `${keyToNote[key]}${octave+1}`
+    } else {
+      return `${keyToNote[key]}${octave}`
+    }
+  }
+
+
+
 
 return (
 <div>
-<div>
-  {keyState.blackobjects.map((blackkey, index) => (
-    <button
-      className={
-        "note-black" +
-        " " +
-        blackkey.id 
-      }
-      key={index}
-    >
-      {blackkey.id.toUpperCase()}
-    </button>
-  ))}
-</div>
-<div>
-  {keyState.whiteobjects.map((whitekey, index) => (
-    <button
-      className={
-        "note-white" +
-        " " +
-        whitekey.id
-      }
-      key={index}
-    > 
-    <div>
-      <div>
-      {whitekey.id}
-      </div>
+  <div className= 'col-1'>
+    <div className='note-wrapper'>
+      {keyState.blackkeys.map((blackkey, index) => (
+        <button
+          className={
+            "note-black" +
+            " " +
+            blackkey.id 
+          }
+          key={index}
+          onMouseDown={() => playNote(getNote(blackkey.id[0], blackkey.shiftUp))}
+          onMouseUp={() => stopNote(getNote(blackkey.id[0], blackkey.shiftUp))}
+          onMouseOut={() => stopNote(getNote(blackkey.id[0], blackkey.shiftUp))}
+        >
+          {blackkey.id.toUpperCase()}
+        </button>
+      ))}
     </div>
-    </button>
-  ))}  
-</div>
-
+    <div className='note-wrapper'>
+      {keyState.whitekeys.map((whitekey, index) => (
+        <button
+          className={
+            "note-white" +
+            " " +
+            whitekey.id
+          }
+          key={index}
+          onMouseDown={() => playNote(getNote(whitekey.id, whitekey.shiftUp))}
+          onMouseUp={() => stopNote(getNote(whitekey.id, whitekey.shiftUp))}
+          onMouseOut={() => stopNote(getNote(whitekey.id, whitekey.shiftUp))}
+        > 
+          {whitekey.id}
+        </button>
+      ))}  
+    </div>
+  </div>
 </div>
 
 )

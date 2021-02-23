@@ -1,0 +1,51 @@
+.synth-keys {
+  height: 80px;
+  width: 80px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid darkgray;
+}
+
+.display {
+  background-color: black;;
+  height: 164px;
+  width: 246px;
+  margin: 2px;
+  border-radius: 2px;
+  border: 1px solid darkgray;
+}
+
+.display-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parameters {
+  /* background-color: #ccc; */
+  height: 80px;
+  width: 164px;
+  margin: 2px;
+  border: 1px solid darkgray;
+}
+
+.volume-key {
+  height: 80px;
+  width: 164px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid darkgray;
+}
+
+.align-knob {
+  display:flex;
+  justify-content: center;
+  align-items:center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}

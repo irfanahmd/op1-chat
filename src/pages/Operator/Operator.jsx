@@ -8,44 +8,78 @@ import * as Tone from "tone";
 
 import io from "socket.io-client";
 
-var total;
-var current;
-
 const SOCKET_SERVER_URL = "http://localhost:3000";
+
+//draw function
+let total;
+let current;
 
 const Operator = (props) => {
 
+  const [synthType, setSynthType] = useState('Synth')
+  const [volume, setVolume] = useState(-9);
+  const[octave, setOctave] = useState(4)
 
   const [attack, setAttack] = useState(0.005)
   const [decay, setDecay] = useState(0.1)
   const [sustain, setSustain] = useState(0.3)
   const [release, setRelease] = useState(1)
+  const [effectType, setEffectType] = useState('')
+
+  const chorus = new Tone.Chorus(4, 2.5, 0.5).toDestination().start()
+  const dist = new Tone.Distortion(0.8).toDestination();
+  const reverb = new Tone.Reverb().toDestination();
+  const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
   
-  const [synthType, setSynthType] = useState('Synth')
-
-  // const { roomId } = props.match.params
-
   const canvasRef = useRef(null)
-
-  const [value, setValue] = useState(-9);
-  const[octave, setOctave] = useState(4)
-
-  const synth = new Tone.PolySynth(Tone[synthType]).toDestination()
   
-  const synthRef = useRef(synth)
+  const synthRef = useRef()
   const socketRef  = useRef() 
- 
-  useEffect(() => {
+
+  useEffect(()=> {
 
     const activeSynths = {}
-    const activeDrums = {}
 
+    if(effectType === 'chorus'){
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(chorus)
+    } else if(effectType === 'dist') {
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(dist)
+    } else if(effectType === 'rev') {
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(reverb)
+    } else if(effectType === 'delay') {
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(feedbackDelay)
+    } else {
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).toDestination()
+    }
+    
     // socketRef.current = io(SOCKET_SERVER_URL, {
     //   query: { roomId }
     // })
 
-    synthRef.current.volume.value = value
-    console.log(synthRef)
+    // console.log(socketRef.current)
+
+    // socketRef.current.on('play', playMessage)
+
+    function playMessage(note){
+      // console.log(note)
+      const incomingNote = {
+        ...note,
+        ownedByCurrentUser: note.senderId === socketRef.current.id
+      }
+
+      let src = note.name
+
+      if(note.instrument === 'synth' && note.type ==='attack'){
+
+      }
+
+    }
+
+  }, [synthType, effectType])
+ 
+  useEffect(() => {
+
+    synthRef.current.volume.value = volume
     synthRef.current.set({
       envelope: {
         attack: attack,
@@ -54,7 +88,7 @@ const Operator = (props) => {
         release: release
       }
     });
-  }, [value, attack, decay, sustain, release, synthType])
+  }, [volume, attack, decay, sustain, release, synthType, effectType])
 
 
 
@@ -207,13 +241,13 @@ const Operator = (props) => {
     ctx.scale(0.5, 0.5)
     draw(ctx, canvas)
 
-  }, [attack, decay, sustain, release])
+  }, [attack, decay, sustain, release, synthType])
 
 
 
   const handleVolume = (event) => {
     console.log(event);
-    setValue(event);
+    setVolume(event);
   };
 
   const handleAttack = (event) => {
@@ -251,29 +285,29 @@ return (
         snap={false}
         min={-50}
         max={0}
-        value={value}
+        value={volume}
         onChange={event => handleVolume(event)}
-      >
-        <Scale 
-          tickWidth={2} 
-          tickHeight={2} 
-          radius={35} 
-        />
-        <circle
-          r="25"
-          cx="50"
-          cy="50"
-          fill="white"
-        />,
-        <Pointer 
-          width={1} 
-          height={20} 
-          radius={5}
-          type="rect"
-          color="#ccc"
-        />
-      </Knob>
-    </button>
+        >
+          <Scale 
+            tickWidth={2} 
+            tickHeight={2} 
+            radius={35} 
+          />
+          <circle
+            r="25"
+            cx="50"
+            cy="50"
+            fill="white"
+          />,
+          <Pointer 
+            width={1} 
+            height={20} 
+            radius={5}
+            type="rect"
+            color="#ccc"
+          />
+        </Knob>
+      </button>
       <button className= "synth-keys">METRONOME</button>
     </div>  
     <div className='display'>
@@ -290,7 +324,9 @@ return (
           snap={false}
           min={0}
           max={2}
-          onChange={event => handleAttack(event)}>
+          onChange={event => handleAttack(event)}
+          onSelect= {event => event.stopPropagation()}
+          >
           <Scale 
             tickWidth={2} 
             tickHeight={2} 
@@ -405,19 +441,19 @@ return (
       </button>
     </div>
     <div className='row'>
-      <button className= "synth-keys" onClick={() => {setSynthType('Synth')}}>1</button>
-      <button className= "synth-keys" onClick={() => {setSynthType('FMSynth')}}>2</button>
-      <button className= "synth-keys" onClick={() => {setSynthType('AMSynth')}}>3</button>
-      <button className= "synth-keys">4</button>
-      <button className= "synth-keys">5</button>
-      <button className= "synth-keys">6</button>
-      <button className= "synth-keys">7</button>
-      <button className= "synth-keys">8</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('Synth')}} disabled={(synthType==='Synth') ? true : false}>1</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('DuoSynth')}} disabled={(synthType==='DuoSynth') ? true : false}>2</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('FMSynth')}} disabled={(synthType==='FMSynth') ? true : false}>3</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('AMSynth')}} disabled={(synthType==='AMSynth') ? true : false}>4</button>
+      <button className= {(effectType!=='chorus') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='chorus') ? setEffectType('chorus') : setEffectType('')}}>7 CHORUS</button>
+      <button className= {(effectType!=='rev') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='rev') ? setEffectType('rev') : setEffectType('')}}>8 REV</button>
+            <button className= {(effectType!=='delay') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='delay') ? setEffectType('delay') : setEffectType('')}}>9 DELAY</button>
+      <button className= {(effectType!=='dist') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='dist') ? setEffectType('dist') : setEffectType('')}}>0 DIST</button>
     </div>
     </div>
     
   </div>
-  <Synth synthRef={synthRef} octave={octave} setOctave={setOctave}/>
+  <Synth socketRef={socketRef} synthRef={synthRef} octave={octave} setOctave={setOctave} setSynthType={setSynthType} setEffectType={setEffectType}/>
   </>
 )
 

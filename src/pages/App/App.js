@@ -1,5 +1,6 @@
+import React from "react";
 import "./App.css";
-import { Route, Switch } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import NavBar from "../../components/NavBar/NavBar";
 import Landing from "../../pages/Landing/Landing";
 import Operator from "../../pages/Operator/Operator";
@@ -9,10 +10,9 @@ function App() {
     <div>
       <NavBar />
       <Switch>
-        <Route exact path="/" component={Landing}></Route>
-        <Route exact path="/roomId:" component={Operator}></Route>
+        <Route exact path="/" component={Landing} />
+        <Route exact path="/:roomId" component={Operator} />
       </Switch>
-      <Operator />
     </div>
   );
 }

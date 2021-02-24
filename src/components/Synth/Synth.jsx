@@ -5,19 +5,16 @@ import { keyToNote, allKeys } from "../../utils/keymap";
 import * as Tone from "tone";
 
 
-
-
 const Synth = (props) => {
 
-  
   const [keyState, setPressed] = useState(allKeys)
 
   useEffect(() => {
-    window.addEventListener("keydown", downHandler);
-    window.addEventListener("keyup", upHandler);
+    document.addEventListener("keydown", downHandler);
+    document.addEventListener("keyup", upHandler);
     return () => {
-      window.removeEventListener("keydown", downHandler);
-      window.removeEventListener("keyup", upHandler);
+      document.removeEventListener("keydown", downHandler);
+      document.removeEventListener("keyup", upHandler);
     };
   }, [props.octave])
 
@@ -26,6 +23,30 @@ const Synth = (props) => {
     if(!event.repeat) {
       const { key } = event;
       let lowkey = key.toLowerCase();
+
+      if (key === 'ArrowLeft') {
+        handleOctaveDown()
+      }
+
+      if (key === 'ArrowRight') {
+        handleOctaveUp()
+      }
+
+      if(key === '1') {
+        props.setSynthType('Synth');
+      }
+
+      if(key === '2') {
+        props.setSynthType('DuoSynth')
+      }
+
+      if(key === '3') {
+        props.setSynthType('FMSynth');
+      }
+
+      if(key === '4') {
+        props.setSynthType('AMSynth')
+      }
   
       if ("asdfghjkl;'".includes(lowkey)) {
         keyState.whitekeys.forEach((wkey, index) => {
@@ -90,7 +111,6 @@ const Synth = (props) => {
   }
 
   function playNote(note) {
-    console.log(props.synth)
     props.synthRef.current.triggerAttack(note)
   }
 

@@ -1,0 +1,13 @@
+.outerDiv {
+  display: flex;
+  justify-content: center;
+}
+
+.enterRoom {
+  width: 600px;
+  margin: 10px;
+}
+
+Button {
+  margin-top: 10px;
+}

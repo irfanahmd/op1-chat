@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import './Operator.css'
 import Synth from "../../components/Synth/Synth";
+import DrumPad from "../../components/DrumPad/DrumPad";
 
 import { Knob, Pointer, Scale} from 'rc-knob'
 
@@ -8,13 +9,16 @@ import * as Tone from "tone";
 
 import io from "socket.io-client";
 
-const SOCKET_SERVER_URL = "http://localhost:3000";
+const SOCKET_SERVER_URL = "http://localhost:4000";
 
 //draw function
 let total;
 let current;
 
 const Operator = (props) => {
+
+  const [showSynth, setShowSynth] = useState(true);
+  const [showDrumPad, setShowDrumPad] = useState(false);
 
   const [synthType, setSynthType] = useState('Synth')
   const [volume, setVolume] = useState(-9);
@@ -36,9 +40,9 @@ const Operator = (props) => {
   const synthRef = useRef()
   const socketRef  = useRef() 
 
-  useEffect(()=> {
+  const { roomId } = props.match.params
 
-    const activeSynths = {}
+  useEffect(()=> {
 
     if(effectType === 'chorus'){
       synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(chorus)
@@ -51,17 +55,17 @@ const Operator = (props) => {
     } else {
       synthRef.current = new Tone.PolySynth(Tone[synthType]).toDestination()
     }
-    
-    // socketRef.current = io(SOCKET_SERVER_URL, {
-    //   query: { roomId }
-    // })
 
-    // console.log(socketRef.current)
+    const activeSynths = {}
+        
+    socketRef.current = io(SOCKET_SERVER_URL, {
+      query: { roomId }
+    })
 
-    // socketRef.current.on('play', playMessage)
+    socketRef.current.on('play', playMessage)
 
     function playMessage(note){
-      // console.log(note)
+  
       const incomingNote = {
         ...note,
         ownedByCurrentUser: note.senderId === socketRef.current.id
@@ -69,13 +73,39 @@ const Operator = (props) => {
 
       let src = note.name
 
+
       if(note.instrument === 'synth' && note.type ==='attack'){
 
+        if(!activeSynths[src]) {
+          activeSynths[src] = synthRef.current
+        }
+        activeSynths[src].triggerAttack(src)
       }
 
+      //account for change in octave
+
+      if(note.instrument === 'synth' && note.type ==='release'){
+        if(activeSynths[src]) { 
+        console.log(activeSynths)
+        activeSynths[src].triggerRelease(src)
+        }
+        let s = src.split("")[0]
+        Object.keys(activeSynths).forEach((key) => {
+          if(key.includes(s)){
+            activeSynths[key].triggerRelease(key)
+          } 
+        })
+      }
     }
 
-  }, [synthType, effectType])
+    return () => {
+      socketRef.current.disconnect()
+      Object.values(activeSynths).forEach((synth) => {
+        synth.dispose()
+      })
+    }
+
+  }, [synthType, effectType, roomId])
  
   useEffect(() => {
 
@@ -88,6 +118,9 @@ const Operator = (props) => {
         release: release
       }
     });
+
+    return synthRef.current
+
   }, [volume, attack, decay, sustain, release, synthType, effectType])
 
 
@@ -241,7 +274,9 @@ const Operator = (props) => {
     ctx.scale(0.5, 0.5)
     draw(ctx, canvas)
 
-  }, [attack, decay, sustain, release, synthType])
+    return synthRef.current;
+
+  }, [attack, decay, sustain, release, synthType, effectType])
 
 
 
@@ -324,6 +359,7 @@ return (
           snap={false}
           min={0}
           max={2}
+          value={attack}
           onChange={event => handleAttack(event)}
           onSelect= {event => event.stopPropagation()}
           >
@@ -356,6 +392,7 @@ return (
         snap={false}
         min={0}
         max={2}
+        value={0.1}
         onChange={event => handleDecay(event)}>
           <Scale 
             tickWidth={2} 
@@ -386,6 +423,7 @@ return (
         snap={false}
         min={0}
         max={1}
+        value={0.8}
         onChange={event => handleSustain(event)}>
           <Scale 
             tickWidth={2} 
@@ -453,7 +491,8 @@ return (
     </div>
     
   </div>
-  <Synth socketRef={socketRef} synthRef={synthRef} octave={octave} setOctave={setOctave} setSynthType={setSynthType} setEffectType={setEffectType}/>
+  <Synth {...props} socketRef={socketRef} synthRef={synthRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType}/>
+
   </>
 )
 

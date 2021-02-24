@@ -4,6 +4,7 @@ import "./Landing.css";
 import "antd/dist/antd.css";
 
 import { Input, Button, Image, Typography } from 'antd';
+
 const { Text} = Typography;
 
 const Landing = () => {
@@ -21,6 +22,7 @@ const Landing = () => {
   }, [])
 
   return (
+
     <div>
       <div className="outerDiv">
         <div className='enterRoom'>
@@ -42,6 +44,7 @@ const Landing = () => {
         </div>
       </div>
     </div>
+
   )
 }
 

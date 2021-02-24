@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import './Synth.css'
 import { keyToNote, allKeys } from "../../utils/keymap";
 
-import * as Tone from "tone";
-
-
 const Synth = (props) => {
 
   const [keyState, setPressed] = useState(allKeys)
@@ -16,7 +13,7 @@ const Synth = (props) => {
       document.removeEventListener("keydown", downHandler);
       document.removeEventListener("keyup", upHandler);
     };
-  }, [props.octave])
+  }, [props.octave, props.effectType, props.synthType])
 
 
   function downHandler(event){
@@ -46,6 +43,30 @@ const Synth = (props) => {
 
       if(key === '4') {
         props.setSynthType('AMSynth')
+      }
+
+      if(key === '7') {
+        (props.effectType !=='chorus') ?
+          props.setEffectType('chorus') :
+          props.setEffectType('')
+      }
+
+      if(key === '8') {
+        (props.effectType !=='rev') ?
+        props.setEffectType('rev') :
+        props.setEffectType('')
+      }
+
+      if(key === '9') {
+        (props.effectType !=='delay') ?
+        props.setEffectType('delay') :
+        props.setEffectType('')
+      }
+
+      if(key === '0') {
+        (props.effectType !=='dist') ?
+        props.setEffectType('dist') :
+        props.setEffectType('')
       }
   
       if ("asdfghjkl;'".includes(lowkey)) {
@@ -111,11 +132,13 @@ const Synth = (props) => {
   }
 
   function playNote(note) {
-    props.synthRef.current.triggerAttack(note)
+    // props.synthRef.current.triggerAttack(note)
+    props.socketRef.current.emit('play', {name: note, type: 'attack', instrument: 'synth'})
   }
 
   function stopNote(note) {
-    props.synthRef.current.triggerRelease(note)
+    // props.synthRef.current.triggerRelease(note)
+    props.socketRef.current.emit('play', {name: note, type: 'release', instrument: 'synth'})
   }
 
   function getNote(key, shift) {
@@ -158,7 +181,7 @@ return (
           onMouseUp={() => stopNote(getNote(blackkey.id[0], blackkey.shiftUp))}
           onMouseOut={() => stopNote(getNote(blackkey.id[0], blackkey.shiftUp))}
         >
-          {blackkey.id.toUpperCase()}
+          {blackkey.id}
         </button>
       ))}
       <div className='note-wrapper'>

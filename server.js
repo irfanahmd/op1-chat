@@ -25,8 +25,8 @@ io.on("connection", (socket) => {
 
 // Configure to use port 3001 instead of 3000 during
 // development to avoid collision with React's dev server
-const port = process.env.PORT || 3001;
+const PORT = 4000;
 
-server.listen(port, function () {
-  console.log(`Express app running on port ${port}`);
+server.listen(PORT, function () {
+  console.log(`Express app running on port ${PORT}`);
 });

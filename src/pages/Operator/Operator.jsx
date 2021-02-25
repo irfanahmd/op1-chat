@@ -3,6 +3,9 @@ import './Operator.css'
 import Synth from "../../components/Synth/Synth";
 import DrumPad from "../../components/DrumPad/DrumPad";
 
+import "antd/dist/antd.css";
+import { InputNumber, Button } from 'antd';
+
 import { Knob, Pointer, Scale} from 'rc-knob'
 
 import * as Tone from "tone";
@@ -17,6 +20,13 @@ let current;
 
 const Operator = (props) => {
 
+  //recording
+
+  let file
+  const recorder = new Tone.Recorder()
+
+  
+  
   const [showSynth, setShowSynth] = useState(true);
   const [showDrumPad, setShowDrumPad] = useState(false);
 
@@ -30,14 +40,14 @@ const Operator = (props) => {
   const [release, setRelease] = useState(1)
   const [effectType, setEffectType] = useState('')
 
-  const chorus = new Tone.Chorus(4, 2.5, 0.5).toDestination().start()
-  const dist = new Tone.Distortion(0.8).toDestination();
-  const reverb = new Tone.Reverb().toDestination();
-  const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+  const chorus = new Tone.Chorus(4, 2.5, 0.5).toDestination().connect(recorder).start()
+  const dist = new Tone.Distortion(0.8).toDestination().connect(recorder)
+  const reverb = new Tone.Reverb().toDestination().connect(recorder)
+  const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination().connect(recorder)
 
   const lowPass = new Tone.Filter({
     frequency: 11000,
-  });
+  }).connect(recorder)
   
   const canvasRef = useRef(null)
   
@@ -52,9 +62,9 @@ const Operator = (props) => {
   useEffect(()=> {
 
     if(effectType === 'chorus'){
-      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(chorus)
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(chorus).connect(recorder)
 
-      kicksRef.current = new Tone.MembraneSynth().connect(chorus)
+      kicksRef.current = new Tone.MembraneSynth().connect(chorus).connect(recorder)
 
       snaresRef.current = new Tone.NoiseSynth({
         volume: 5,
@@ -68,7 +78,7 @@ const Operator = (props) => {
           sustain: 0,
           release: 0.03,
         },
-      }).chain(lowPass, chorus)
+      }).chain(lowPass, chorus).connect(recorder)
 
       hihatsRef.current = new Tone.NoiseSynth({
         volume: -10,
@@ -76,12 +86,12 @@ const Operator = (props) => {
           attack: 0.02,
           decay: 0.03
         }
-      }).connect(chorus)
+      }).connect(chorus).connect(recorder)
       
     } else if(effectType === 'dist') {
-      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(dist)
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(dist).connect(recorder)
 
-      kicksRef.current = new Tone.MembraneSynth().connect(dist)
+      kicksRef.current = new Tone.MembraneSynth().connect(dist).connect(recorder)
 
       snaresRef.current = new Tone.NoiseSynth({
         volume: 5,
@@ -95,7 +105,7 @@ const Operator = (props) => {
           sustain: 0,
           release: 0.03,
         },
-      }).chain(lowPass, dist)
+      }).chain(lowPass, dist).connect(recorder)
 
       hihatsRef.current = new Tone.NoiseSynth({
         volume: -10,
@@ -103,14 +113,14 @@ const Operator = (props) => {
           attack: 0.02,
           decay: 0.03
         }
-      }).connect(dist)
+      }).connect(dist).connect(recorder)
 
 
 
     } else if(effectType === 'rev') {
-      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(reverb)
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(reverb).connect(recorder)
 
-      kicksRef.current = new Tone.MembraneSynth().connect(reverb)
+      kicksRef.current = new Tone.MembraneSynth().connect(reverb).connect(recorder)
 
       snaresRef.current = new Tone.NoiseSynth({
         volume: 5,
@@ -124,7 +134,7 @@ const Operator = (props) => {
           sustain: 0,
           release: 0.03,
         },
-      }).chain(lowPass, reverb)
+      }).chain(lowPass, reverb).connect(recorder)
 
       hihatsRef.current = new Tone.NoiseSynth({
         volume: -10,
@@ -132,12 +142,12 @@ const Operator = (props) => {
           attack: 0.02,
           decay: 0.03
         }
-      }).connect(reverb)
+      }).connect(reverb).connect(recorder)
 
     } else if(effectType === 'delay') {
-      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(feedbackDelay)
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(feedbackDelay).connect(recorder)
 
-      kicksRef.current = new Tone.MembraneSynth().connect(feedbackDelay)
+      kicksRef.current = new Tone.MembraneSynth().connect(feedbackDelay).connect(recorder)
 
       snaresRef.current = new Tone.NoiseSynth({
         volume: 5,
@@ -151,7 +161,7 @@ const Operator = (props) => {
           sustain: 0,
           release: 0.03,
         },
-      }).chain(lowPass, feedbackDelay)
+      }).chain(lowPass, feedbackDelay).connect(recorder)
 
       hihatsRef.current = new Tone.NoiseSynth({
         volume: -10,
@@ -159,11 +169,12 @@ const Operator = (props) => {
           attack: 0.02,
           decay: 0.03
         }
-      }).connect(feedbackDelay)
+      }).connect(feedbackDelay).connect(recorder)
 
     } else {
-      synthRef.current = new Tone.PolySynth(Tone[synthType]).toDestination()
-      kicksRef.current = new Tone.MembraneSynth().toDestination();
+      synthRef.current = new Tone.PolySynth(Tone[synthType]).toDestination().connect(recorder)
+
+      kicksRef.current = new Tone.MembraneSynth().toDestination().connect(recorder)
       snaresRef.current = new Tone.NoiseSynth({
         volume: 5,
         noise: {
@@ -176,7 +187,7 @@ const Operator = (props) => {
           sustain: 0,
           release: 0.03,
         },
-      }).connect(lowPass).toDestination();
+      }).connect(lowPass).toDestination().connect(recorder)
 
       hihatsRef.current = new Tone.NoiseSynth({
         volume: -10,
@@ -184,7 +195,7 @@ const Operator = (props) => {
           attack: 0.02,
           decay: 0.03
         }
-      }).toDestination();
+      }).toDestination().connect(recorder)
     }
 
     const activeSynths = {}
@@ -284,7 +295,7 @@ const Operator = (props) => {
         sustain: sustain,
         release: release
       }
-    });
+    }).connect(recorder)
 
     return synthRef.current
 
@@ -477,7 +488,7 @@ return (
   <>
   <div className='display-wrapper'>
     <div className= 'col'>
-      <button className= "volume-key align-knob" disabled={showDrumPad && true}>
+      <button className= "volume-key align-knob">
         <Knob 
         size={100}  
         angleOffset={220} 
@@ -509,7 +520,13 @@ return (
           />
         </Knob>
       </button>
-      <button className= "synth-keys">METRONOME</button>
+      <div className='row'>
+      <button className= "synth-keys">
+      <svg viewBox="0 0 56.693 56.693">
+      <path d="M33.4 24c-.7 0-1.3.6-1.3 1.3 0 .2.1.5.2.6l-1.5 1.6-1.5-4.3c-.1-.2-.2-.3-.4-.3h-1.1c-.2 0-.3.1-.4.3l-3.2 9.2c0 .1 0 .3.1.4.1.1.2.2.3.2H32c.1 0 .2-.1.3-.2s.1-.2.1-.4L31 28.5l1.8-1.9c.2.1.4.1.6.1.7 0 1.3-.6 1.3-1.3s-.6-1.4-1.3-1.4zm-1.9 8.3h-6.3l2.9-8.4h.5l1.5 4.4-2.7 2.9.6.5 2.4-2.6 1.1 3.2z" class="f"></path>
+      </svg>
+      </button>
+      </div>
     </div>  
     <div className='display'>
     <canvas ref={canvasRef} height="164" width="246" ></canvas>
@@ -620,7 +637,7 @@ return (
         snap={false}
         min={0}
         max={5}
-        value={2.5}
+        value={5}
         onChange={event => handleRelease(event)}
         >
           <Scale 
@@ -657,8 +674,8 @@ return (
     </div>
     
   </div>
-  {showSynth && <Synth {...props} socketRef={socketRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} toggleInstrument={toggleInstrument}/>} 
-  {showDrumPad && <DrumPad {...props} toggleInstrument={toggleInstrument} socketRef={socketRef} synthType={synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType}/>}
+  {showSynth && <Synth {...props} socketRef={socketRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} toggleInstrument={toggleInstrument} recorder={recorder} />} 
+  {showDrumPad && <DrumPad {...props} toggleInstrument={toggleInstrument} socketRef={socketRef} synthType={synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} recorder={recorder}/>}
   </>
 )
 

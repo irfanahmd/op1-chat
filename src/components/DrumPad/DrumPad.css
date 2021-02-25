@@ -21,6 +21,20 @@
   text-transform: uppercase;
 }
 
+.note-black.disabled {
+  background: lightgrey;
+  color: lightgrey;
+  border: 1px solid lightgrey;
+  opacity: 0.3;
+}
+
+.note-white.disabled {
+  background: white;
+  color: white;
+  border: 1px solid lightgrey;
+  opacity: 0.3;
+}
+
 .note-black.e,
 .note-black.p {
   height: 80px;

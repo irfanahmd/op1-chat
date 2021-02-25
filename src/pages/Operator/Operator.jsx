@@ -34,10 +34,17 @@ const Operator = (props) => {
   const dist = new Tone.Distortion(0.8).toDestination();
   const reverb = new Tone.Reverb().toDestination();
   const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+
+  const lowPass = new Tone.Filter({
+    frequency: 11000,
+  });
   
   const canvasRef = useRef(null)
   
   const synthRef = useRef()
+  const kicksRef = useRef()
+  const snaresRef = useRef()
+  const hihatsRef = useRef()
   const socketRef  = useRef() 
 
   const { roomId } = props.match.params
@@ -46,17 +53,144 @@ const Operator = (props) => {
 
     if(effectType === 'chorus'){
       synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(chorus)
+
+      kicksRef.current = new Tone.MembraneSynth().connect(chorus)
+
+      snaresRef.current = new Tone.NoiseSynth({
+        volume: 5,
+        noise: {
+          type: 'pink',
+          playbackRate: 3,
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.20,
+          sustain: 0,
+          release: 0.03,
+        },
+      }).chain(lowPass, chorus)
+
+      hihatsRef.current = new Tone.NoiseSynth({
+        volume: -10,
+        envelope: {
+          attack: 0.02,
+          decay: 0.03
+        }
+      }).connect(chorus)
+      
     } else if(effectType === 'dist') {
       synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(dist)
+
+      kicksRef.current = new Tone.MembraneSynth().connect(dist)
+
+      snaresRef.current = new Tone.NoiseSynth({
+        volume: 5,
+        noise: {
+          type: 'pink',
+          playbackRate: 3,
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.20,
+          sustain: 0,
+          release: 0.03,
+        },
+      }).chain(lowPass, dist)
+
+      hihatsRef.current = new Tone.NoiseSynth({
+        volume: -10,
+        envelope: {
+          attack: 0.02,
+          decay: 0.03
+        }
+      }).connect(dist)
+
+
+
     } else if(effectType === 'rev') {
       synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(reverb)
+
+      kicksRef.current = new Tone.MembraneSynth().connect(reverb)
+
+      snaresRef.current = new Tone.NoiseSynth({
+        volume: 5,
+        noise: {
+          type: 'pink',
+          playbackRate: 3,
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.20,
+          sustain: 0,
+          release: 0.03,
+        },
+      }).chain(lowPass, reverb)
+
+      hihatsRef.current = new Tone.NoiseSynth({
+        volume: -10,
+        envelope: {
+          attack: 0.02,
+          decay: 0.03
+        }
+      }).connect(reverb)
+
     } else if(effectType === 'delay') {
       synthRef.current = new Tone.PolySynth(Tone[synthType]).connect(feedbackDelay)
+
+      kicksRef.current = new Tone.MembraneSynth().connect(feedbackDelay)
+
+      snaresRef.current = new Tone.NoiseSynth({
+        volume: 5,
+        noise: {
+          type: 'pink',
+          playbackRate: 3,
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.20,
+          sustain: 0,
+          release: 0.03,
+        },
+      }).chain(lowPass, feedbackDelay)
+
+      hihatsRef.current = new Tone.NoiseSynth({
+        volume: -10,
+        envelope: {
+          attack: 0.02,
+          decay: 0.03
+        }
+      }).connect(feedbackDelay)
+
     } else {
       synthRef.current = new Tone.PolySynth(Tone[synthType]).toDestination()
+      kicksRef.current = new Tone.MembraneSynth().toDestination();
+      snaresRef.current = new Tone.NoiseSynth({
+        volume: 5,
+        noise: {
+          type: 'pink',
+          playbackRate: 3,
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.20,
+          sustain: 0,
+          release: 0.03,
+        },
+      }).connect(lowPass).toDestination();
+
+      hihatsRef.current = new Tone.NoiseSynth({
+        volume: -10,
+        envelope: {
+          attack: 0.02,
+          decay: 0.03
+        }
+      }).toDestination();
     }
 
     const activeSynths = {}
+    const activeKicks = {}
+    const activeSnares = {}
+    const activeHihats = {}
         
     socketRef.current = io(SOCKET_SERVER_URL, {
       query: { roomId }
@@ -73,7 +207,6 @@ const Operator = (props) => {
 
       let src = note.name
 
-
       if(note.instrument === 'synth' && note.type ==='attack'){
 
         if(!activeSynths[src]) {
@@ -86,7 +219,6 @@ const Operator = (props) => {
 
       if(note.instrument === 'synth' && note.type ==='release'){
         if(activeSynths[src]) { 
-        console.log(activeSynths)
         activeSynths[src].triggerRelease(src)
         }
         let s = src.split("")[0]
@@ -96,6 +228,28 @@ const Operator = (props) => {
           } 
         })
       }
+
+      if(note.instrument === 'drumpad' && note.name === 'a'){
+        if(!activeKicks[src]) {
+          activeKicks[src] = kicksRef.current
+        }
+        activeKicks[src].triggerAttackRelease('C0','2n'); 
+      }
+
+      if(note.instrument === 'drumpad' && note.name === 's'){
+        if(!activeSnares[src]) {
+          activeSnares[src] = snaresRef.current
+        }
+        activeSnares[src].triggerAttackRelease('16n'); 
+      }
+
+      if((note.instrument === 'drumpad' && note.name === 't') || (note.instrument === 'drumpad' && note.name === 'y')){
+        if(!activeHihats[src]) {
+          activeHihats[src] = hihatsRef.current
+        }
+        activeHihats[src].triggerAttackRelease('32n'); 
+      }
+
     }
 
     return () => {
@@ -105,7 +259,7 @@ const Operator = (props) => {
       })
     }
 
-  }, [synthType, effectType, roomId])
+  }, [synthType, effectType, roomId, showDrumPad, showSynth])
  
   useEffect(() => {
 
@@ -281,30 +435,29 @@ const Operator = (props) => {
 
 
   const handleVolume = (event) => {
-    console.log(event);
     setVolume(event);
   };
 
   const handleAttack = (event) => {
     setAttack(event);
-    console.log(event)
   }
 
   const handleDecay = (event) => {
     setDecay(event);
-    console.log(event)
   }
 
   const handleSustain = (event) => {
     setSustain(event);
-    console.log(event)
   }
 
   const handleRelease = (event) => {
     setRelease(event);
-    console.log(event)
   }
 
+  function toggleInstrument() {
+    setShowSynth(!showSynth);
+    setShowDrumPad(!showDrumPad);
+  }
 
 
 return (
@@ -479,10 +632,10 @@ return (
       </button>
     </div>
     <div className='row'>
-      <button className= "synth-keys" onClick={() => {setSynthType('Synth')}} disabled={(synthType==='Synth') ? true : false}>1</button>
-      <button className= "synth-keys" onClick={() => {setSynthType('DuoSynth')}} disabled={(synthType==='DuoSynth') ? true : false}>2</button>
-      <button className= "synth-keys" onClick={() => {setSynthType('FMSynth')}} disabled={(synthType==='FMSynth') ? true : false}>3</button>
-      <button className= "synth-keys" onClick={() => {setSynthType('AMSynth')}} disabled={(synthType==='AMSynth') ? true : false}>4</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('Synth')}} disabled={(synthType==='Synth' || showDrumPad) ? true : false}>1</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('DuoSynth')}} disabled={(synthType==='DuoSynth' || showDrumPad) ? true : false}>2</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('FMSynth')}} disabled={(synthType==='FMSynth' || showDrumPad) ? true : false}>3</button>
+      <button className= "synth-keys" onClick={() => {setSynthType('AMSynth')}} disabled={(synthType==='AMSynth' || showDrumPad) ? true : false}>4</button>
       <button className= {(effectType!=='chorus') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='chorus') ? setEffectType('chorus') : setEffectType('')}}>7 CHORUS</button>
       <button className= {(effectType!=='rev') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='rev') ? setEffectType('rev') : setEffectType('')}}>8 REV</button>
             <button className= {(effectType!=='delay') ? "synth-keys" : "synth-keys toggled"} onClick={() => {(effectType !=='delay') ? setEffectType('delay') : setEffectType('')}}>9 DELAY</button>
@@ -491,8 +644,8 @@ return (
     </div>
     
   </div>
-  <Synth {...props} socketRef={socketRef} synthRef={synthRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType}/>
-
+  {showSynth && <Synth {...props} socketRef={socketRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} toggleInstrument={toggleInstrument}/>} 
+  {showDrumPad && <DrumPad {...props} toggleInstrument={toggleInstrument} socketRef={socketRef} synthType={synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType}/>}
   </>
 )
 

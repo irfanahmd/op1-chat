@@ -13,7 +13,7 @@ const Synth = (props) => {
       document.removeEventListener("keydown", downHandler);
       document.removeEventListener("keyup", upHandler);
     };
-  }, [props.octave, props.effectType, props.synthType])
+  }, [props.octave, props.effectType, props.synthType, props.showSynth])
 
 
   function downHandler(event){
@@ -190,7 +190,7 @@ return (
           <path  fill="#0098D4" d="M31.93 32.047c-.848 0-1.536-.688-1.536-1.535v-4.42c0-.403-.33-.73-.733-.73-.406 0-.736.327-.736.73l-.026 4.422c0 .845-.688 1.533-1.535 1.533s-1.535-.688-1.535-1.535v-4.42c0-.403-.33-.73-.735-.73-.406 0-.736.327-.736.73l-.01 4.42c0 .847-.687 1.535-1.533 1.535-.847 0-1.536-.688-1.536-1.535v-.4h.8v.4c0 .405.33.734.736.734.404 0 .733-.33.733-.734l.01-4.42c0-.844.688-1.532 1.536-1.532.847 0 1.536.688 1.536 1.533v4.42c0 .404.328.733.733.733s.734-.33.734-.734l.026-4.42c0-.844.69-1.532 1.538-1.532.847 0 1.535.688 1.535 1.533v4.42c0 .404.33.733.734.733s.734-.33.734-.734l-.01-4.418c0-.846.69-1.534 1.536-1.534s1.535.688 1.535 1.533v.4h-.8v-.4c0-.404-.33-.732-.735-.732s-.735.33-.735.733l.01 4.418c0 .848-.69 1.537-1.536 1.537z" ></path>
           </svg>
         </button>
-        <button className= "synth-keys">🥁</button>
+        <button className= "synth-keys" onClick={props.toggleInstrument}>🥁</button>
       </div>
     </div>
     <div className='note-wrapper'>

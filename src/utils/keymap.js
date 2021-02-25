@@ -49,4 +49,31 @@ const allKeys = {
   ],
 };
 
-export { keyToNote, allKeys };
+
+const drumKeys = {
+  blackkeys: [
+    { id: "q  w", pressed: false, disabled: true },
+    { id: "e", pressed: false, disabled: true },
+    { id: "r", pressed: false, disabled: true },
+    { id: "t  y hihat", pressed: false, disabled: false },
+    { id: "u", pressed: false, disabled: true },
+    { id: "i  o", pressed: false, disabled: true },
+    { id: "p", pressed: false, disabled: true },
+    { id: "[", pressed: false, disabled: true },
+  ],
+  whitekeys: [
+    { id: "a kick", pressed: false, disabled: false },
+    { id: "s snare", pressed: false, disabled: false },
+    { id: "d", pressed: false, disabled: true },
+    { id: "f", pressed: false, disabled: true },
+    { id: "g", pressed: false, disabled: true },
+    { id: "h", pressed: false, disabled: true },
+    { id: "j", pressed: false, disabled: true },
+    { id: "k", pressed: false, disabled: true },
+    { id: "l", pressed: false, disabled: true },
+    { id: ";", pressed: false, disabled: true },
+    { id: "'", pressed: false, disabled: true },
+  ],
+};
+
+export { keyToNote, allKeys, drumKeys };

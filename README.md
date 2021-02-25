@@ -1,4 +1,4 @@
-# OP-1 Chat 🎹 💬
+# OP-1 Chat 🎹
 
 OP-1 Chat is a simple web-based synthesizer and synth chat room bundled into one! It allows artists to play live in real time with each other via chat rooms.
 
@@ -20,6 +20,6 @@ Create a room to get started. You can share the link to the room to play live in
 
 ## Screenshots
 
-<img width="704" alt="OP1-Chat" src="https://user-images.githubusercontent.com/70832125/109113335-17f14c00-770a-11eb-9894-631c154b41df.png">
+<img width="704" alt="OP1-Chat" src="https://user-images.githubusercontent.com/70832125/109115176-abc41780-770c-11eb-94c9-88a62f11af7e.png">
 
 

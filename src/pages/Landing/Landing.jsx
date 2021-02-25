@@ -29,7 +29,7 @@ const Landing = () => {
           <h2 style={{display: 'inline'}}>OP-1 CHAT </h2> 
           <Text code>Developed for the Mintbean JS MusicHacks: Web-Beats Hackathon</Text>
 
-          <Image width={600}src="https://user-images.githubusercontent.com/70832125/109113335-17f14c00-770a-11eb-9894-631c154b41df.png" alt="OP-1-Chat" />
+          <Image width={800}src="https://user-images.githubusercontent.com/70832125/109113335-17f14c00-770a-11eb-9894-631c154b41df.png" alt="OP-1-Chat" />
           <p>A simple to use web-based synthesizer that allows artists to play live in real time with each other via chat rooms </p>
           <Input
           type='text'

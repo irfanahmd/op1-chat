@@ -12,7 +12,8 @@ import * as Tone from "tone";
 
 import io from "socket.io-client";
 
-const SOCKET_SERVER_URL = "http://localhost:4000";
+// const SOCKET_SERVER_URL = "http://localhost:4000";
+const SOCKET_SERVER_URL = "https://irfanahmd.github.io/op1-chat/";
 
 //draw function
 let total;

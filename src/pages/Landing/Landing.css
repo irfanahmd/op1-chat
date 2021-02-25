@@ -1,10 +1,11 @@
 .outerDiv {
   display: flex;
   justify-content: center;
+  text-align: center;
 }
 
 .enterRoom {
-  width: 600px;
+  width: 800px;
   margin: 10px;
 }
 

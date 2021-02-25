@@ -23,10 +23,7 @@ const Operator = (props) => {
 
   //recording
 
-  let file
   const recorder = new Tone.Recorder()
-
-  
   
   const [showSynth, setShowSynth] = useState(true);
   const [showDrumPad, setShowDrumPad] = useState(false);
@@ -453,7 +450,7 @@ const Operator = (props) => {
     ctx.scale(0.5, 0.5)
     draw(ctx, canvas)
 
-    return synthRef.current;
+    return canvasRef.current
 
   }, [attack, decay, sustain, release, synthType, effectType])
 
@@ -465,6 +462,7 @@ const Operator = (props) => {
 
   const handleAttack = (event) => {
     setAttack(event);
+    console.log(attack)
   }
 
   const handleDecay = (event) => {
@@ -545,7 +543,6 @@ return (
           max={2}
           value={0}
           onChange={event => handleAttack(event)}
-          onSelect= {event => event.stopPropagation()}
           >
           <Scale 
             tickWidth={2} 
@@ -675,7 +672,7 @@ return (
     </div>
     
   </div>
-  {showSynth && <Synth {...props} socketRef={socketRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} toggleInstrument={toggleInstrument} recorder={recorder} />} 
+  {showSynth && <Synth {...props} socketRef={socketRef} octave={octave} setOctave={setOctave} synthType= {synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} toggleInstrument={toggleInstrument} recorder={recorder} synthRef={synthRef}/>} 
   {showDrumPad && <DrumPad {...props} toggleInstrument={toggleInstrument} socketRef={socketRef} synthType={synthType} setSynthType={setSynthType} effectType={effectType} setEffectType={setEffectType} recorder={recorder}/>}
   </>
 )

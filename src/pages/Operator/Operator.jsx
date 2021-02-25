@@ -257,6 +257,15 @@ const Operator = (props) => {
       Object.values(activeSynths).forEach((synth) => {
         synth.dispose()
       })
+      Object.values(activeKicks).forEach((synth) => {
+        synth.dispose()
+      })
+      Object.values(activeSnares).forEach((synth) => {
+        synth.dispose()
+      })
+      Object.values(activeHihats).forEach((synth) => {
+        synth.dispose()
+      })
     }
 
   }, [synthType, effectType, roomId, showDrumPad, showSynth])
@@ -264,6 +273,10 @@ const Operator = (props) => {
   useEffect(() => {
 
     synthRef.current.volume.value = volume
+    kicksRef.current.volume.value = volume + 5
+    snaresRef.current.volume.value = volume + 5
+    hihatsRef.current.volume.value = volume
+
     synthRef.current.set({
       envelope: {
         attack: attack,
@@ -275,7 +288,7 @@ const Operator = (props) => {
 
     return synthRef.current
 
-  }, [volume, attack, decay, sustain, release, synthType, effectType])
+  }, [volume, attack, decay, sustain, release, synthType, effectType, showSynth])
 
 
 
@@ -464,7 +477,7 @@ return (
   <>
   <div className='display-wrapper'>
     <div className= 'col'>
-      <button className= "volume-key align-knob">
+      <button className= "volume-key align-knob" disabled={showDrumPad && true}>
         <Knob 
         size={100}  
         angleOffset={220} 
@@ -503,16 +516,16 @@ return (
     </div>
     <div className= 'col'>
     <div className='row'>
-      <button className= "parameters align-knob">
+      <button className= "parameters align-knob" disabled={showDrumPad && true}>
         <Knob 
           size={100}  
           angleOffset={220} 
-          angleRange={360}
+          angleRange={280}
           steps={10}
           snap={false}
           min={0}
           max={2}
-          value={attack}
+          value={0}
           onChange={event => handleAttack(event)}
           onSelect= {event => event.stopPropagation()}
           >
@@ -536,16 +549,16 @@ return (
           />
         </Knob>
       </button>
-      <button className= "parameters align-knob">
+      <button className= "parameters align-knob" disabled={showDrumPad && true}>
         <Knob 
         size={100}  
         angleOffset={220} 
-        angleRange={360}
+        angleRange={280}
         steps={10}
         snap={false}
         min={0}
         max={2}
-        value={0.1}
+        value={0}
         onChange={event => handleDecay(event)}>
           <Scale 
             tickWidth={2} 
@@ -567,16 +580,16 @@ return (
           />
         </Knob>
       </button>
-      <button className= "parameters align-knob">
+      <button className= "parameters align-knob" disabled={showDrumPad && true}>
         <Knob 
         size={100}  
         angleOffset={220} 
-        angleRange={360}
+        angleRange={280}
         steps={10}
         snap={false}
         min={0}
         max={1}
-        value={0.8}
+        value={3}
         onChange={event => handleSustain(event)}>
           <Scale 
             tickWidth={2} 
@@ -598,16 +611,16 @@ return (
           />
         </Knob>
       </button>
-      <button className= "parameters align-knob">
+      <button className= "parameters align-knob" disabled={showDrumPad && true}>
         <Knob 
         size={100}  
         angleOffset={220} 
-        angleRange={360}
+        angleRange={280}
         steps={10}
         snap={false}
         min={0}
         max={5}
-        value={2}
+        value={2.5}
         onChange={event => handleRelease(event)}
         >
           <Scale 

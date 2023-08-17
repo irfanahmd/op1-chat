@@ -13,7 +13,7 @@ import * as Tone from "tone";
 import io from "socket.io-client";
 
 // const SOCKET_SERVER_URL = "http://localhost:4000";
-const SOCKET_SERVER_URL = "https://op1-chat.netlify.app/";
+const SOCKET_SERVER_URL = "https://op1-chat.onrender.com/";
 
 //draw function
 let total;

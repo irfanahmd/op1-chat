@@ -12,7 +12,7 @@ OP-1 Chat is a simple web-based synthesizer and synth chat room bundled into one
 
 ## Getting Started
 
-https://op1-chat.herokuapp.com/
+https://op1-chat.onrender.com
 
 Create a room to get started. You can share the link to the room to play live in real time with others.
 
